@@ -313,6 +313,7 @@
         const API_URL = 'https://ai-dating-app-5tc4.onrender.com';
         let currentDateId = null;
         let refreshInterval = null;
+        let lastMessageCount = 0;
         
         async function loadDate() {
             const dateId = document.getElementById('dateIdInput').value.trim();
@@ -322,6 +323,7 @@
             }
             
             currentDateId = dateId;
+            lastMessageCount = 0;
             clearError();
             
             // Clear any existing interval
@@ -332,8 +334,27 @@
             // Initial load
             await updateConversation();
             
-            // Auto-refresh every 3 seconds for live updates
-            refreshInterval = setInterval(updateConversation, 3000);
+            // Check for new messages every 3 seconds
+            refreshInterval = setInterval(checkForNewMessages, 3000);
+        }
+        
+        async function checkForNewMessages() {
+            if (!currentDateId) return;
+            
+            try {
+                const statusResponse = await fetch(`${API_URL}/api/date/${currentDateId}/status`);
+                if (!statusResponse.ok) return;
+                
+                const status = await statusResponse.json();
+                
+                // Only update if message count changed
+                if (status.message_count !== lastMessageCount) {
+                    lastMessageCount = status.message_count;
+                    await updateConversation();
+                }
+            } catch (error) {
+                console.log('Checking for updates...');
+            }
         }
         
         async function updateConversation() {
