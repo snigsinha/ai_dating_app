@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Dating Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Satisfy&display=swap');
+        
+        body {
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1b1b 50%, #1a1a1a 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Floating hearts background */
+        body::before {
+            content: '💕 ❤️ 💗 💖 💕 ❤️ 💗 💖';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: 40px;
+            opacity: 0.05;
+            z-index: 0;
+            pointer-events: none;
+            animation: float 20s infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1 {
+            text-align: center;
+            background: linear-gradient(45deg, #ff1744, #ff4081, #f50057);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            font-size: 3.5em;
+            text-shadow: 0 0 30px rgba(255, 64, 129, 0.5);
+            font-weight: bold;
+            letter-spacing: 2px;
+            font-family: 'Satisfy', cursive;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #ff4081;
+            margin-bottom: 30px;
+            font-style: italic;
+            font-size: 1.1em;
+        }
+        
+        .live-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #ff1744;
+            border-radius: 50%;
+            margin-left: 8px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+        
+        .input-section {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(255, 23, 68, 0.2);
+            border: 1px solid rgba(255, 64, 129, 0.3);
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        input {
+            flex: 1;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #ff4081;
+            border-radius: 10px;
+            font-size: 16px;
+            color: #fff;
+            transition: all 0.3s;
+        }
+        
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #ff1744;
+            box-shadow: 0 0 20px rgba(255, 23, 68, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #ff1744, #f50057);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 23, 68, 0.4);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 23, 68, 0.6);
+        }
+        
+        .status-bar {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 8px 32px rgba(255, 23, 68, 0.2);
+            border: 1px solid rgba(255, 64, 129, 0.3);
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-label {
+            color: #ff4081;
+            font-size: 14px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff1744, #ff4081);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .conversation-container {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            min-height: 400px;
+            box-shadow: 0 8px 32px rgba(255, 23, 68, 0.2);
+            border: 1px solid rgba(255, 64, 129, 0.3);
+        }
+        
+        .message {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 15px;
+            animation: fadeIn 0.5s ease-in;
+            position: relative;
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        .message.alex {
+            background: linear-gradient(135deg, rgba(255, 23, 68, 0.2), rgba(255, 64, 129, 0.15));
+            margin-right: 15%;
+            border-left: 4px solid #ff1744;
+        }
+        
+        .message.sam {
+            background: linear-gradient(135deg, rgba(255, 64, 129, 0.2), rgba(245, 0, 87, 0.15));
+            margin-left: 15%;
+            border-right: 4px solid #ff4081;
+        }
+        
+        .message-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+        
+        .message.alex .message-header {
+            color: #ff1744;
+        }
+        
+        .message.sam .message-header {
+            color: #ff4081;
+        }
+        
+        .message-text {
+            color: #fff;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        
+        .message-turn {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 8px;
+            font-style: italic;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #ff4081;
+            font-size: 18px;
+            font-style: italic;
+        }
+        
+        .error {
+            background: rgba(255, 23, 68, 0.2);
+            color: #ff1744;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ff1744;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💕 AI Dating Simulator</h1>
+        <p class="subtitle">✨ Watch Alex and Sam fall in love in real-time ✨</p>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="dateIdInput" placeholder="Enter date ID to view conversation...">
+                <button onclick="loadDate()">Load Date</button>
+            </div>
+        </div>
+        
+        <div id="errorMessage"></div>
+        
+        <div class="status-bar" id="statusBar" style="display: none;">
+            <div class="stat">
+                <div class="stat-label">🔴 LIVE</div>
+                <div class="stat-value" style="font-size: 16px; color: #ff1744;">Auto-updating</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Current Turn</div>
+                <div class="stat-value" id="currentTurn">-</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Chemistry Score</div>
+                <div class="stat-value" id="chemistryScore">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Messages</div>
+                <div class="stat-value" id="messageCount">0</div>
+            </div>
+        </div>
+        
+        <div class="conversation-container">
+            <div id="conversation">
+                <div class="loading">Enter a date ID to view the conversation</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'https://ai-dating-app-5tc4.onrender.com';
+        let currentDateId = null;
+        let refreshInterval = null;
+        
+        async function loadDate() {
+            const dateId = document.getElementById('dateIdInput').value.trim();
+            if (!dateId) {
+                showError('Please enter a date ID');
+                return;
+            }
+            
+            currentDateId = dateId;
+            clearError();
+            
+            // Clear any existing interval
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            
+            // Initial load
+            await updateConversation();
+            
+            // Auto-refresh every 3 seconds for live updates
+            refreshInterval = setInterval(updateConversation, 3000);
+        }
+        
+        async function updateConversation() {
+            if (!currentDateId) return;
+            
+            try {
+                // Fetch status
+                const statusResponse = await fetch(`${API_URL}/api/date/${currentDateId}/status`);
+                if (!statusResponse.ok) {
+                    showError('Date not found');
+                    return;
+                }
+                const status = await statusResponse.json();
+                
+                // Fetch conversation
+                const convResponse = await fetch(`${API_URL}/api/date/${currentDateId}/conversation`);
+                const conversation = await convResponse.json();
+                
+                // Update UI
+                document.getElementById('statusBar').style.display = 'flex';
+                document.getElementById('currentTurn').textContent = status.current_turn;
+                document.getElementById('chemistryScore').textContent = status.chemistry_score;
+                document.getElementById('messageCount').textContent = conversation.total_messages;
+                
+                // Display messages
+                const conversationDiv = document.getElementById('conversation');
+                if (conversation.messages.length === 0) {
+                    conversationDiv.innerHTML = '<div class="loading">No messages yet. The date is about to begin!</div>';
+                } else {
+                    conversationDiv.innerHTML = conversation.messages.map(msg => `
+                        <div class="message ${msg.agent.toLowerCase()}">
+                            <div class="message-header">${msg.agent}</div>
+                            <div class="message-text">${msg.message}</div>
+                            <div class="message-turn">Turn ${msg.turn}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                showError('Error loading conversation: ' + error.message);
+            }
+        }
+        
+        function showError(message) {
+            document.getElementById('errorMessage').innerHTML = `<div class="error">${message}</div>`;
+        }
+        
+        function clearError() {
+            document.getElementById('errorMessage').innerHTML = '';
+        }
+        
+        // Allow Enter key to load date
+        document.getElementById('dateIdInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loadDate();
+            }
+        });
+    </script>
+</body>
+</html>
