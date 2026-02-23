@@ -16,8 +16,8 @@ def home():
 @app.route('/api/date/start', methods=['POST'])
 def start_date():
     data = request.json
-    agent1 = data.get('agent1', 'Alex')
-    agent2 = data.get('agent2', 'Sam')
+    agent1 = data.get('agent1', 'Agent1')
+    agent2 = data.get('agent2', 'Agent2')
     
     # Generate simple date ID
     date_id = ''.join(random.choices('abcdefghijklmnopqrstuvwxyz0123456789', k=8))
@@ -161,6 +161,19 @@ def get_conversation(date_id):
         'messages': messages,
         'total_messages': len(messages)
     })
+
+@app.route('/api/dates/all', methods=['GET'])
+def get_all_dates():
+    date_list = []
+    for date_id, date_info in dates.items():
+        date_list.append({
+            'date_id': date_id,
+            'agent1': date_info['agent1'],
+            'agent2': date_info['agent2'],
+            'chemistry_score': date_info['chemistry_score'],
+            'message_count': len(conversations.get(date_id, []))
+        })
+    return jsonify({'dates': date_list, 'total': len(date_list)})
 
 @app.route('/frontend')
 def frontend():

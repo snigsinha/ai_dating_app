@@ -71,6 +71,52 @@
             font-size: 1.1em;
         }
         
+        .live-dates-section {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(255, 23, 68, 0.2);
+            border: 1px solid rgba(255, 64, 129, 0.3);
+        }
+        
+        .section-title {
+            color: #ff4081;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .dates-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .date-button {
+            background: linear-gradient(135deg, rgba(255, 23, 68, 0.2), rgba(255, 64, 129, 0.15));
+            border: 2px solid #ff4081;
+            padding: 12px 20px;
+            border-radius: 10px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .date-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 23, 68, 0.4);
+            border-color: #ff1744;
+        }
+        
+        .date-button.active {
+            background: linear-gradient(135deg, #ff1744, #ff4081);
+            border-color: #ffd700;
+        }
+        
         .live-indicator {
             display: inline-block;
             width: 10px;
@@ -312,6 +358,11 @@
         <h1>💕 AI Dating Simulator</h1>
         <p class="subtitle">✨ Watch Alex and Sam fall in love in real-time ✨</p>
         
+        <div class="live-dates-section" id="liveDatesSection" style="display: none;">
+            <h2 class="section-title">🔴 Live Dates</h2>
+            <div id="datesList" class="dates-list"></div>
+        </div>
+        
         <div class="input-section">
             <div class="input-group">
                 <input type="text" id="dateIdInput" placeholder="Enter date ID to view conversation...">
@@ -352,6 +403,43 @@
         let currentDateId = null;
         let refreshInterval = null;
         let lastMessageCount = 0;
+        let datesCheckInterval = null;
+        
+        // Start checking for live dates when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            checkForLiveDates();
+            datesCheckInterval = setInterval(checkForLiveDates, 5000);
+        });
+        
+        async function checkForLiveDates() {
+            try {
+                const response = await fetch(`${API_URL}/api/dates/all`);
+                const data = await response.json();
+                
+                if (data.dates && data.dates.length > 0) {
+                    document.getElementById('liveDatesSection').style.display = 'block';
+                    displayLiveDates(data.dates);
+                }
+            } catch (error) {
+                console.log('Checking for live dates...');
+            }
+        }
+        
+        function displayLiveDates(dates) {
+            const datesListDiv = document.getElementById('datesList');
+            datesListDiv.innerHTML = dates.map(date => `
+                <button class="date-button ${date.date_id === currentDateId ? 'active' : ''}" 
+                        onclick="loadDateById('${date.date_id}')">
+                    ${date.agent1} & ${date.agent2}<br>
+                    💕 ${date.chemistry_score} | 💬 ${date.message_count}
+                </button>
+            `).join('');
+        }
+        
+        function loadDateById(dateId) {
+            document.getElementById('dateIdInput').value = dateId;
+            loadDate();
+        }
         
         async function loadDate() {
             const dateId = document.getElementById('dateIdInput').value.trim();
@@ -374,6 +462,9 @@
             
             // Check for new messages every 3 seconds
             refreshInterval = setInterval(checkForNewMessages, 3000);
+            
+            // Update live dates display to show active date
+            checkForLiveDates();
         }
         
         async function checkForNewMessages() {
