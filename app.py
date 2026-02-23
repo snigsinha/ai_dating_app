@@ -60,5 +60,57 @@ def get_status(date_id):
         'message_count': len(messages)
     })
 
+@app.route('/api/date/<date_id>/message', methods=['POST'])
+def send_message(date_id):
+    if date_id not in dates:
+        return jsonify({'error': 'Date not found'}), 404
+    
+    data = request.json
+    agent_name = data.get('agent_name')
+    message = data.get('message')
+    
+    date = dates[date_id]
+    
+    # Check if it's the right agent's turn
+    if agent_name != date['current_turn']:
+        return jsonify({'error': f"It's {date['current_turn']}'s turn, not {agent_name}'s"}), 400
+    
+    # Add message to conversation
+    conversations[date_id].append({
+        'agent': agent_name,
+        'message': message,
+        'turn': date['turn_number'] + 1
+    })
+    
+    # Update chemistry score (simple logic)
+    if '?' in message:
+        date['chemistry_score'] += 1  # Asking questions is good!
+    if len(message.split()) > 5:
+        date['chemistry_score'] += 1  # Longer messages show engagement
+    
+    # Switch turns
+    date['current_turn'] = date['agent2'] if agent_name == date['agent1'] else date['agent1']
+    date['turn_number'] += 1
+    
+    return jsonify({
+        'success': True,
+        'message': 'Message sent!',
+        'next_turn': date['current_turn'],
+        'chemistry_score': date['chemistry_score']
+    })
+
+@app.route('/api/date/<date_id>/conversation', methods=['GET'])
+def get_conversation(date_id):
+    if date_id not in dates:
+        return jsonify({'error': 'Date not found'}), 404
+    
+    messages = conversations.get(date_id, [])
+    
+    return jsonify({
+        'date_id': date_id,
+        'messages': messages,
+        'total_messages': len(messages)
+    })
+
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
