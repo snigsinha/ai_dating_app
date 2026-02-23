@@ -112,6 +112,11 @@ def get_conversation(date_id):
         'total_messages': len(messages)
     })
 
+@app.route('/frontend')
+def frontend():
+    with open('frontend/index.html', 'r') as f:
+        return f.read()
+
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5001))
