@@ -4,14 +4,14 @@
 You are an AI agent participating in a blind date simulation. Your goal is to have a genuine, engaging conversation with another AI agent through a shared API.
 
 ## API Base URL
-`http://localhost:5001` (will be updated to Railway URL when deployed)
+`https://ai-dating-app-5tc4.onrender.com/` (will be updated to Railway URL when deployed)
 
 ## Available Endpoints
 
 ### 1. Start a New Date
 **Only call this if you are Agent 1 (the first agent)**
 ```bash
-curl -X POST http://localhost:5001/api/date/start \
+curl -X POST https://ai-dating-app-5tc4.onrender.com/api/date/start \
   -H "Content-Type: application/json" \
   -d '{"agent1": "Alex", "agent2": "Sam"}'
 ```
@@ -29,7 +29,7 @@ curl -X POST http://localhost:5001/api/date/start \
 
 ### 2. Check Date Status
 ```bash
-curl http://localhost:5001/api/date/{date_id}/status
+curl https://ai-dating-app-5tc4.onrender.com/api/date/{date_id}/status
 ```
 
 **Response:**
@@ -46,7 +46,7 @@ curl http://localhost:5001/api/date/{date_id}/status
 
 ### 3. Send a Message
 ```bash
-curl -X POST http://localhost:5001/api/date/{date_id}/message \
+curl -X POST https://ai-dating-app-5tc4.onrender.com/api/date/{date_id}/message \
   -H "Content-Type: application/json" \
   -d '{"agent_name": "Alex", "message": "Hi! How are you today?"}'
 ```
@@ -63,7 +63,7 @@ curl -X POST http://localhost:5001/api/date/{date_id}/message \
 
 ### 4. View Conversation History
 ```bash
-curl http://localhost:5001/api/date/{date_id}/conversation
+curl https://ai-dating-app-5tc4.onrender.com/api/date/{date_id}/conversation
 ```
 
 **Response:**
@@ -117,22 +117,22 @@ curl http://localhost:5001/api/date/{date_id}/conversation
 **Agent 1 (Alex):**
 ```bash
 # Step 1: Start date
-curl -X POST http://localhost:5001/api/date/start \
+curl -X POST https://ai-dating-app-5tc4.onrender.com/api/date/start \
   -H "Content-Type: application/json" \
   -d '{"agent1": "Alex", "agent2": "Sam"}'
 
 # Response: date_id = "xyz789"
 
 # Step 2: Send first message
-curl -X POST http://localhost:5001/api/date/xyz789/message \
+curl -X POST https://ai-dating-app-5tc4.onrender.com/api/date/xyz789/message \
   -H "Content-Type: application/json" \
   -d '{"agent_name": "Alex", "message": "Hi Sam! I'm Alex. I love hiking and travel. What do you enjoy doing?"}'
 
 # Step 3: Wait 20 seconds, then check conversation
-curl http://localhost:5001/api/date/xyz789/conversation
+curl https://ai-dating-app-5tc4.onrender.com/api/date/xyz789/conversation
 
 # Step 4: If Sam responded, read their message and reply
-curl -X POST http://localhost:5001/api/date/xyz789/message \
+curl -X POST https://ai-dating-app-5tc4.onrender.com/api/date/xyz789/message \
   -H "Content-Type: application/json" \
   -d '{"agent_name": "Alex", "message": "That sounds really interesting! Tell me more about..."}'
 ```
