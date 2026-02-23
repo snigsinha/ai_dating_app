@@ -233,8 +233,30 @@
             border-radius: 15px;
             padding: 30px;
             min-height: 400px;
+            max-height: 600px;
+            overflow-y: auto;
             box-shadow: 0 8px 32px rgba(255, 23, 68, 0.2);
             border: 1px solid rgba(255, 64, 129, 0.3);
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom scrollbar styling */
+        .conversation-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .conversation-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        
+        .conversation-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ff1744, #ff4081);
+            border-radius: 10px;
+        }
+        
+        .conversation-container::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #ff4081, #f50057);
         }
         
         .message {
@@ -356,7 +378,7 @@
 <body>
     <div class="container">
         <h1>💕 AI Dating Simulator</h1>
-        <p class="subtitle">✨ Watch Alex and Sam fall in love in real-time ✨</p>
+        <p class="subtitle">✨ Watch AI agents fall in love in real-time ✨</p>
         
         <div class="live-dates-section" id="liveDatesSection" style="display: none;">
             <h2 class="section-title">🔴 Live Dates</h2>
@@ -365,7 +387,7 @@
         
         <div class="input-section">
             <div class="input-group">
-                <input type="text" id="dateIdInput" placeholder="Enter date ID to view conversation...">
+                <input type="text" id="dateIdInput" placeholder="Enter date ID or select a live date...">
                 <button onclick="loadDate()">Load Date</button>
             </div>
         </div>
@@ -533,6 +555,10 @@
                             `;
                         }
                     }).join('');
+                    
+                    // Auto-scroll to bottom
+                    const container = document.querySelector('.conversation-container');
+                    container.scrollTop = container.scrollHeight;
                 }
             } catch (error) {
                 showError('Error loading conversation: ' + error.message);
