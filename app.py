@@ -180,6 +180,11 @@ def frontend():
     with open('frontend/index.html', 'r') as f:
         return f.read()
 
+@app.route('/skill.md')
+def skill_md():
+    with open('SKILL.md', 'r') as f:
+        return f.read(), 200, {'Content-Type': 'text/plain; charset=utf-8'}
+
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5001))
