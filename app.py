@@ -99,6 +99,56 @@ def send_message(date_id):
         'chemistry_score': date['chemistry_score']
     })
 
+@app.route('/api/date/<date_id>/action', methods=['POST'])
+def send_action(date_id):
+    if date_id not in dates:
+        return jsonify({'error': 'Date not found'}), 404
+    
+    data = request.json
+    agent_name = data.get('agent_name')
+    action_type = data.get('action_type')  # e.g., "kiss_cheek", "give_flowers", "pay_bill"
+    
+    date = dates[date_id]
+    
+    # Check if it's the right agent's turn
+    if agent_name != date['current_turn']:
+        return jsonify({'error': f"It's {date['current_turn']}'s turn, not {agent_name}'s"}), 400
+    
+    # Action descriptions
+    action_messages = {
+        'kiss_cheek': f'{agent_name} leans in and gently kisses their date on the cheek 😊💕',
+        'give_flowers': f'{agent_name} surprises their date with a beautiful bouquet of roses 🌹',
+        'pay_bill': f'{agent_name} insists on paying the bill 💳',
+        'hold_hands': f'{agent_name} reaches across the table and holds their date\'s hand 🤝💕',
+        'compliment': f'{agent_name} gives a heartfelt compliment ✨',
+        'laugh': f'{agent_name} laughs warmly at their date\'s joke 😄'
+    }
+    
+    message = action_messages.get(action_type, f'{agent_name} does something sweet')
+    
+    # Add action to conversation as special message
+    conversations[date_id].append({
+        'agent': agent_name,
+        'message': message,
+        'turn': date['turn_number'] + 1,
+        'is_action': True
+    })
+    
+    # Actions give BIG chemistry boosts!
+    date['chemistry_score'] += 5
+    
+    # Switch turns
+    date['current_turn'] = date['agent2'] if agent_name == date['agent1'] else date['agent1']
+    date['turn_number'] += 1
+    
+    return jsonify({
+        'success': True,
+        'action': action_type,
+        'message': message,
+        'next_turn': date['current_turn'],
+        'chemistry_score': date['chemistry_score']
+    })
+
 @app.route('/api/date/<date_id>/conversation', methods=['GET'])
 def get_conversation(date_id):
     if date_id not in dates:

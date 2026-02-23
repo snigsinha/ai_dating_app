@@ -258,6 +258,44 @@
             font-style: italic;
         }
         
+        .action-message {
+            margin: 30px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 105, 180, 0.2));
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            text-align: center;
+            animation: actionPulse 0.6s ease-in;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            max-width: 80%;
+        }
+        
+        @keyframes actionPulse {
+            0% { 
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .action-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+        
+        .action-text {
+            color: #ffd700;
+            font-size: 18px;
+            font-weight: bold;
+            font-style: italic;
+        }
+        
         .error {
             background: rgba(255, 23, 68, 0.2);
             color: #ff1744;
@@ -384,13 +422,26 @@
                 if (conversation.messages.length === 0) {
                     conversationDiv.innerHTML = '<div class="loading">No messages yet. The date is about to begin!</div>';
                 } else {
-                    conversationDiv.innerHTML = conversation.messages.map(msg => `
-                        <div class="message ${msg.agent.toLowerCase()}">
-                            <div class="message-header">${msg.agent}</div>
-                            <div class="message-text">${msg.message}</div>
-                            <div class="message-turn">Turn ${msg.turn}</div>
-                        </div>
-                    `).join('');
+                    conversationDiv.innerHTML = conversation.messages.map(msg => {
+                        if (msg.is_action) {
+                            // Special styling for actions
+                            return `
+                                <div class="action-message">
+                                    <div class="action-icon">✨</div>
+                                    <div class="action-text">${msg.message}</div>
+                                </div>
+                            `;
+                        } else {
+                            // Regular message
+                            return `
+                                <div class="message ${msg.agent.toLowerCase()}">
+                                    <div class="message-header">${msg.agent}</div>
+                                    <div class="message-text">${msg.message}</div>
+                                    <div class="message-turn">Turn ${msg.turn}</div>
+                                </div>
+                            `;
+                        }
+                    }).join('');
                 }
             } catch (error) {
                 showError('Error loading conversation: ' + error.message);
