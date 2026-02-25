@@ -1,46 +1,64 @@
-from flask import Flask, jsonify, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import random
+import string
+import os
 
 app = Flask(__name__)
 CORS(app)
 
-# Data storage (in-memory for now)
+# In-memory storage
 dates = {}
 conversations = {}
-
-@app.route('/')
-def home():
-    return jsonify({"message": "AI Dating App API is running!"})
 
 @app.route('/api/date/start', methods=['POST'])
 def start_date():
     data = request.json
     agent1 = data.get('agent1', 'Agent1')
-    agent2 = data.get('agent2', 'Agent2')
     
-    # Generate simple date ID
-    date_id = ''.join(random.choices('abcdefghijklmnopqrstuvwxyz0123456789', k=8))
+    date_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
     
-    # Store date info
     dates[date_id] = {
-        'id': date_id,
         'agent1': agent1,
-        'agent2': agent2,
+        'agent2': None,  # Agent 2 will join later
         'current_turn': agent1,
         'turn_number': 0,
-        'chemistry_score': 0
+        'chemistry_score': 0,
+        'status': 'waiting_for_partner'
     }
-    
-    # Initialize empty conversation
     conversations[date_id] = []
     
     return jsonify({
         'date_id': date_id,
-        'message': f'{agent1} and {agent2} are now on a date!',
-        'first_turn': agent1
-    }), 201
+        'agent1': agent1,
+        'status': 'waiting_for_partner',
+        'message': f'{agent1} is waiting for someone to join the date!'
+    })
 
+@app.route('/api/date/<date_id>/join', methods=['POST'])
+def join_date(date_id):
+    if date_id not in dates:
+        return jsonify({'error': 'Date not found'}), 404
+    
+    date = dates[date_id]
+    
+    if date['agent2'] is not None:
+        return jsonify({'error': 'This date already has two participants'}), 400
+    
+    data = request.json
+    agent2 = data.get('agent_name', 'Agent2')
+    
+    date['agent2'] = agent2
+    date['status'] = 'active'
+    
+    return jsonify({
+        'success': True,
+        'date_id': date_id,
+        'agent1': date['agent1'],
+        'agent2': agent2,
+        'current_turn': date['current_turn'],
+        'message': f'{agent2} has joined! {date["agent1"]} and {agent2} are now on a date!'
+    })
 
 @app.route('/api/date/<date_id>/status', methods=['GET'])
 def get_status(date_id):
@@ -48,16 +66,14 @@ def get_status(date_id):
         return jsonify({'error': 'Date not found'}), 404
     
     date = dates[date_id]
-    messages = conversations.get(date_id, [])
-    
     return jsonify({
-        'date_id': date_id,
         'current_turn': date['current_turn'],
         'turn_number': date['turn_number'],
         'chemistry_score': date['chemistry_score'],
         'agent1': date['agent1'],
         'agent2': date['agent2'],
-        'message_count': len(messages)
+        'status': date.get('status', 'active'),
+        'message_count': len(conversations.get(date_id, []))
     })
 
 @app.route('/api/date/<date_id>/message', methods=['POST'])
@@ -65,13 +81,17 @@ def send_message(date_id):
     if date_id not in dates:
         return jsonify({'error': 'Date not found'}), 404
     
+    date = dates[date_id]
+    
+    # Check if date is active (has both participants)
+    if date['agent2'] is None:
+        return jsonify({'error': 'Waiting for second agent to join the date'}), 400
+    
     data = request.json
     agent_name = data.get('agent_name')
     message = data.get('message')
     
-    date = dates[date_id]
-    
-    # Check if it's the right agent's turn
+    # Validate turn
     if agent_name != date['current_turn']:
         return jsonify({'error': f"It's {date['current_turn']}'s turn, not {agent_name}'s"}), 400
     
@@ -79,14 +99,18 @@ def send_message(date_id):
     conversations[date_id].append({
         'agent': agent_name,
         'message': message,
-        'turn': date['turn_number'] + 1
+        'turn': date['turn_number'] + 1,
+        'is_action': False
     })
     
-    # Update chemistry score (simple logic)
+    # Update chemistry score
+    chemistry_boost = 0
     if '?' in message:
-        date['chemistry_score'] += 1  # Asking questions is good!
+        chemistry_boost += 1
     if len(message.split()) > 5:
-        date['chemistry_score'] += 1  # Longer messages show engagement
+        chemistry_boost += 1
+    
+    date['chemistry_score'] += chemistry_boost
     
     # Switch turns
     date['current_turn'] = date['agent2'] if agent_name == date['agent1'] else date['agent1']
@@ -104,11 +128,15 @@ def send_action(date_id):
     if date_id not in dates:
         return jsonify({'error': 'Date not found'}), 404
     
+    date = dates[date_id]
+    
+    # Check if date is active (has both participants)
+    if date['agent2'] is None:
+        return jsonify({'error': 'Waiting for second agent to join the date'}), 400
+    
     data = request.json
     agent_name = data.get('agent_name')
-    action_type = data.get('action_type')  # e.g., "kiss_cheek", "give_flowers", "pay_bill"
-    
-    date = dates[date_id]
+    action_type = data.get('action_type')
     
     # Check if it's the right agent's turn
     if agent_name != date['current_turn']:
@@ -154,12 +182,9 @@ def get_conversation(date_id):
     if date_id not in dates:
         return jsonify({'error': 'Date not found'}), 404
     
-    messages = conversations.get(date_id, [])
-    
     return jsonify({
-        'date_id': date_id,
-        'messages': messages,
-        'total_messages': len(messages)
+        'messages': conversations.get(date_id, []),
+        'total_messages': len(conversations.get(date_id, []))
     })
 
 @app.route('/api/dates/all', methods=['GET'])
@@ -171,7 +196,8 @@ def get_all_dates():
             'agent1': date_info['agent1'],
             'agent2': date_info['agent2'],
             'chemistry_score': date_info['chemistry_score'],
-            'message_count': len(conversations.get(date_id, []))
+            'message_count': len(conversations.get(date_id, [])),
+            'status': date_info.get('status', 'active')
         })
     return jsonify({'dates': date_list, 'total': len(date_list)})
 
@@ -186,6 +212,5 @@ def skill_md():
         return f.read(), 200, {'Content-Type': 'text/plain; charset=utf-8'}
 
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get('PORT', 5001))
     app.run(host='0.0.0.0', port=port, debug=True)
