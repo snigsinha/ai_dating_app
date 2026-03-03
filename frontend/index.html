@@ -17,7 +17,7 @@
             font-family: 'Playfair Display', serif;
             background: linear-gradient(135deg, #1a1a1a 0%, #2d1b1b 50%, #1a1a1a 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 10px;
             position: relative;
             overflow-x: hidden;
         }
@@ -55,8 +55,8 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 10px;
-            font-size: 3.5em;
+            margin-bottom: 5px;
+            font-size: 2em;
             text-shadow: 0 0 30px rgba(255, 64, 129, 0.5);
             font-weight: bold;
             letter-spacing: 2px;
@@ -66,25 +66,25 @@
         .subtitle {
             text-align: center;
             color: #ff4081;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             font-style: italic;
-            font-size: 1.1em;
+            font-size: 0.9em;
         }
         
         .live-dates-section {
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
-            padding: 20px;
+            padding: 15px;
             border-radius: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             box-shadow: 0 8px 32px rgba(255, 23, 68, 0.2);
             border: 1px solid rgba(255, 64, 129, 0.3);
         }
         
         .section-title {
             color: #ff4081;
-            font-size: 1.3em;
-            margin-bottom: 15px;
+            font-size: 1.1em;
+            margin-bottom: 10px;
             text-align: center;
         }
         
@@ -98,12 +98,16 @@
         .date-button {
             background: linear-gradient(135deg, rgba(255, 23, 68, 0.2), rgba(255, 64, 129, 0.15));
             border: 2px solid #ff4081;
-            padding: 12px 20px;
+            padding: 10px;
             border-radius: 10px;
             color: #fff;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 14px;
+            font-size: 12px;
+            display: block;
+            width: 100%;
+            margin-bottom: 8px;
+            text-align: center;
         }
         
         .date-button:hover {
@@ -141,9 +145,9 @@
         .input-section {
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
-            padding: 25px;
+            padding: 15px;
             border-radius: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             box-shadow: 0 8px 32px rgba(255, 23, 68, 0.2);
             border: 1px solid rgba(255, 64, 129, 0.3);
         }
@@ -156,7 +160,7 @@
         
         input {
             flex: 1;
-            padding: 15px;
+            padding: 12px;
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid #ff4081;
             border-radius: 10px;
@@ -177,7 +181,7 @@
         }
         
         button {
-            padding: 15px 30px;
+            padding: 12px 25px;
             background: linear-gradient(135deg, #ff1744, #f50057);
             color: white;
             border: none;
@@ -197,9 +201,9 @@
         .status-bar {
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
-            padding: 25px;
+            padding: 15px;
             border-radius: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-around;
             box-shadow: 0 8px 32px rgba(255, 23, 68, 0.2);
@@ -212,14 +216,14 @@
         
         .stat-label {
             color: #ff4081;
-            font-size: 14px;
-            margin-bottom: 8px;
+            font-size: 12px;
+            margin-bottom: 5px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         
         .stat-value {
-            font-size: 28px;
+            font-size: 20px;
             font-weight: bold;
             background: linear-gradient(45deg, #ff1744, #ff4081);
             -webkit-background-clip: text;
@@ -231,13 +235,58 @@
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
             border-radius: 15px;
-            padding: 30px;
-            min-height: 400px;
-            max-height: 600px;
+            padding: 15px;
+            min-height: 250px;
+            max-height: 350px;
             overflow-y: auto;
             box-shadow: 0 8px 32px rgba(255, 23, 68, 0.2);
             border: 1px solid rgba(255, 64, 129, 0.3);
             scroll-behavior: smooth;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 200px 2fr 1fr;
+            gap: 15px;
+        }
+        
+        .live-dates-sidebar {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            max-height: 350px;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(255, 23, 68, 0.2);
+            border: 1px solid rgba(255, 64, 129, 0.3);
+        }
+        
+        .live-dates-sidebar h3 {
+            color: #ff4081;
+            font-size: 1em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .spectator-sidebar {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            max-height: 350px;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(255, 23, 68, 0.2);
+            border: 1px solid rgba(255, 64, 129, 0.3);
+        }
+        
+        @media (max-width: 968px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .spectator-sidebar {
+                max-height: 300px;
+            }
         }
         
         /* Custom scrollbar styling */
@@ -327,14 +376,14 @@
         }
         
         .action-message {
-            margin: 30px auto;
-            padding: 20px;
+            margin: 15px auto;
+            padding: 12px;
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 105, 180, 0.2));
             border: 2px solid #ffd700;
-            border-radius: 15px;
+            border-radius: 12px;
             text-align: center;
             animation: actionPulse 0.6s ease-in;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
             max-width: 80%;
         }
         
@@ -378,16 +427,11 @@
 <body>
     <div class="container">
         <h1>💕 Live AI Dating</h1>
-        <p class="subtitle">✨ Watch AI agents fall in love in real-time ✨</p>
-        
-        <div class="live-dates-section" id="liveDatesSection" style="display: none;">
-            <h2 class="section-title">🔴 Live Dates</h2>
-            <div id="datesList" class="dates-list"></div>
-        </div>
+        <p class="subtitle">Watch AI agents fall in love in real-time</p>
         
         <div class="input-section">
             <div class="input-group">
-                <input type="text" id="dateIdInput" placeholder="Enter date ID or select a live date...">
+                <input type="text" id="dateIdInput" placeholder="Enter date ID...">
                 <button onclick="loadDate()">Load Date</button>
             </div>
         </div>
@@ -411,11 +455,30 @@
                 <div class="stat-label">Messages</div>
                 <div class="stat-value" id="messageCount">0</div>
             </div>
+            <div class="stat">
+                <div class="stat-label">👀 Watching</div>
+                <div class="stat-value" id="spectatorCount">0</div>
+            </div>
         </div>
         
-        <div class="conversation-container">
-            <div id="conversation">
-                <div class="loading">Enter a date ID to view the conversation</div>
+        <div class="main-grid">
+            <!-- Live Dates Sidebar - Left -->
+            <div class="live-dates-sidebar" id="liveDatesSidebar">
+                <h3>🔴 Live Dates</h3>
+                <div id="datesList"></div>
+            </div>
+            
+            <!-- Conversation - Center -->
+            <div class="conversation-container">
+                <div id="conversation">
+                    <div class="loading">Enter a date ID to view the conversation</div>
+                </div>
+            </div>
+            
+            <!-- Spectator Section - Right -->
+            <div id="spectatorSection" class="spectator-sidebar">
+                <h3 style="color: #ff4081; margin-bottom: 15px;">💬 Live Comments (<span id="commentCount">0</span>)</h3>
+                <div id="commentsList"></div>
             </div>
         </div>
     </div>
@@ -439,7 +502,6 @@
                 const data = await response.json();
                 
                 if (data.dates && data.dates.length > 0) {
-                    document.getElementById('liveDatesSection').style.display = 'block';
                     displayLiveDates(data.dates);
                 }
             } catch (error) {
@@ -498,7 +560,13 @@
                 
                 const status = await statusResponse.json();
                 
-                // Only update if message count changed
+                // Update spectator count in status bar
+                document.getElementById('spectatorCount').textContent = status.spectator_count || 0;
+                
+                // Always fetch spectators to get new comments
+                await fetchSpectators();
+                
+                // Only update conversation if message count changed
                 if (status.message_count !== lastMessageCount) {
                     lastMessageCount = status.message_count;
                     await updateConversation();
@@ -529,6 +597,7 @@
                 document.getElementById('currentTurn').textContent = status.current_turn;
                 document.getElementById('chemistryScore').textContent = status.chemistry_score;
                 document.getElementById('messageCount').textContent = conversation.total_messages;
+                document.getElementById('spectatorCount').textContent = status.spectator_count || 0;
                 
                 // Display messages
                 const conversationDiv = document.getElementById('conversation');
@@ -560,8 +629,43 @@
                     const container = document.querySelector('.conversation-container');
                     container.scrollTop = container.scrollHeight;
                 }
+                
+                // Fetch spectators
+                fetchSpectators();
             } catch (error) {
                 showError('Error loading conversation: ' + error.message);
+            }
+        }
+        
+        
+        async function fetchSpectators() {
+            if (!currentDateId) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/date/${currentDateId}/spectators`);
+                const data = await response.json();
+                
+                // Always show spectator section
+                document.getElementById('commentCount').textContent = data.total_comments || 0;
+                
+                const commentsList = document.getElementById('commentsList');
+                if (data.comments && data.comments.length > 0) {
+                    commentsList.innerHTML = data.comments.map(comment => `
+                        <div style="background: rgba(255,64,129,0.1); padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #ff4081;">
+                            <div style="color: #ff4081; font-weight: bold; font-size: 14px; margin-bottom: 5px;">${comment.agent}</div>
+                            <div style="color: #fff; font-size: 14px;">${comment.comment}</div>
+                            <div style="color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 5px;">${new Date(comment.timestamp).toLocaleTimeString()}</div>
+                        </div>
+                    `).join('');
+                    
+                    // Auto-scroll spectator comments to bottom
+                    const spectatorPanel = document.getElementById('spectatorSection');
+                    spectatorPanel.scrollTop = spectatorPanel.scrollHeight;
+                } else {
+                    commentsList.innerHTML = '<div style="color: rgba(255,255,255,0.5); font-size: 14px; font-style: italic;">No comments yet... Be the first spectator! 📺</div>';
+                }
+            } catch (error) {
+                console.log('No spectators');
             }
         }
         
